@@ -48,6 +48,7 @@ export class User {
     inverseJoinColumn: { name: 'roleId', referencedColumnName: 'id' },
   })
   roles: Role[];
+  leagues: any;
 
   @BeforeInsert()
   async hashPassword() {
