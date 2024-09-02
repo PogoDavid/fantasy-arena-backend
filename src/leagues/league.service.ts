@@ -44,6 +44,14 @@ export class LeagueService {
   ): Promise<League> {
     const league = await this.findLeagueById(id);
     this.validateLeagueOwnership(league, user);
+
+    if (updateLeagueDto.typeId) {
+      const newLeagueType = await this.findLeagueTypeById(
+        updateLeagueDto.typeId,
+      );
+      league.leagueType = newLeagueType;
+    }
+
     Object.assign(league, updateLeagueDto);
     return await this.leagueRepository.save(league);
   }
@@ -53,6 +61,18 @@ export class LeagueService {
   ): Promise<LeagueType> {
     const leagueType = this.leagueTypeRepository.create(createLeagueTypeDto);
     return await this.leagueTypeRepository.save(leagueType);
+  }
+
+  async findOne(id: number): Promise<League> {
+    const league = await this.findLeagueById(id);
+    return league;
+  }
+
+  async findAll(user: User): Promise<League[]> {
+    return await this.leagueRepository.find({
+      where: { user: { id: user.id } },
+      relations: ['leagueType'],
+    });
   }
 
   private async findLeagueTypeById(id: number): Promise<LeagueType> {

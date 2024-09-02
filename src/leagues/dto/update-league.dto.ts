@@ -7,5 +7,9 @@ export class UpdateLeagueDto {
 
   @IsNumber()
   @IsOptional()
+  typeId?: number;
+
+  @IsNumber()
+  @IsOptional()
   budget?: number;
 }
