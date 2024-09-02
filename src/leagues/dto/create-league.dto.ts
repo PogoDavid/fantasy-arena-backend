@@ -1,5 +1,4 @@
 import { IsString, IsNotEmpty, IsOptional, IsNumber } from 'class-validator';
-import { LeagueType } from 'src/entities/league-type.entity';
 
 export class CreateLeagueDto {
   @IsString()
@@ -8,7 +7,7 @@ export class CreateLeagueDto {
 
   @IsNumber()
   @IsNotEmpty()
-  type: LeagueType;
+  typeId: number;
 
   @IsNumber()
   @IsOptional()

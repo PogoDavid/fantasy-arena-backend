@@ -21,7 +21,7 @@ export class League {
 
   @ManyToOne(() => LeagueType)
   @JoinColumn({ name: 'type_id' })
-  type: LeagueType;
+  leagueType: LeagueType;
 
   @ManyToOne(() => User, (user) => user.leagues, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })

@@ -12,6 +12,6 @@ export class LeagueType {
   @Column({ type: 'text', nullable: true })
   description: string;
 
-  @OneToMany(() => League, (league) => league.type)
+  @OneToMany(() => League, (league) => league.leagueType)
   leagues: League[];
 }
