@@ -66,6 +66,10 @@ export class UsersService {
     }
   }
 
+  async save(user: User): Promise<User> {
+    return this.userRepository.save(user);
+  }
+
   async update(
     id: number,
     updateUserDto: UpdateUserDTO,

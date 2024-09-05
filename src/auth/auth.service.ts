@@ -8,20 +8,24 @@ import { UsersService } from '../users/user.service';
 import * as bcrypt from 'bcrypt';
 import { LoginDTO } from './dto/login.dto';
 import { RegisterDTO } from './dto/register.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Role } from '../entities/role.entity';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
+    @InjectRepository(Role)
+    private readonly roleRepository: Repository<Role>,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findOneByEmail(email);
 
     if (user && (await bcrypt.compare(pass, user.password))) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { password, ...result } = user;
+      const { ...result } = user;
       return result;
     }
 
@@ -30,8 +34,21 @@ export class AuthService {
 
   async register(registerDto: RegisterDTO) {
     try {
-      const user = await this.usersService.create(registerDto);
-      const roles = user.roles?.map((role) => role.name) || [];
+      const basicRole = await this.roleRepository.findOne({
+        where: { name: 'basic' },
+      });
+      if (!basicRole) {
+        throw new InternalServerErrorException('Basic role not found');
+      }
+
+      const user = await this.usersService.create({
+        ...registerDto,
+        roles: [basicRole.id],
+      });
+
+      await this.usersService.save(user);
+
+      const roles = user.roles.map((role) => role.name);
       const payload = { email: user.email, sub: user.id, roles };
 
       return {
@@ -51,7 +68,7 @@ export class AuthService {
       const user = await this.usersService.findOneByEmail(loginDto.email);
 
       if (user && bcrypt.compareSync(loginDto.password, user.password)) {
-        const roles = user.roles?.map((role) => role.name) || [];
+        const roles = user.roles ? user.roles.map((role) => role.name) : [];
         const payload = { email: user.email, sub: user.id, roles };
 
         return {
